@@ -5,7 +5,7 @@ from setuptools import find_packages
 setup(
     name="dynmen_scripts",
     version="0.1.0",
-    url="https://github.com/frostidaho/dynmen-scripts",
+    url="https://github.com/frostidaho/dynmen_scripts",
 
     author="Idaho Frost",
     author_email="frostidaho@gmail.com",
