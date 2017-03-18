@@ -1,7 +1,9 @@
-import setuptools
+#!/usr/bin/env python
+from distutils.core import setup
+from setuptools import find_packages
 
-setuptools.setup(
-    name="dynmen_scripts",
+setup(
+    name="dynmen-scripts",
     version="0.1.0",
     url="https://github.com/frostidaho/dynmen-scripts",
 
@@ -11,7 +13,7 @@ setuptools.setup(
     description="A collection of scripts using dynmen",
     long_description=open('README.rst').read(),
 
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     entry_points={
         'console_scripts': [
             'rofi-run = dynmen_scripts.rofi_run:main',
@@ -25,7 +27,9 @@ setuptools.setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 )
