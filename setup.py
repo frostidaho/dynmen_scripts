@@ -12,7 +12,11 @@ setuptools.setup(
     long_description=open('README.rst').read(),
 
     packages=setuptools.find_packages(),
-
+    entry_points={
+        'console_scripts': [
+            'rofi-run = dynmen_scripts.rofi_run:main',
+        ],
+    },
     install_requires=[],
 
     classifiers=[
