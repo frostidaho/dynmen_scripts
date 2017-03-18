@@ -3,7 +3,7 @@ from distutils.core import setup
 from setuptools import find_packages
 
 setup(
-    name="dynmen-scripts",
+    name="dynmen_scripts",
     version="0.1.0",
     url="https://github.com/frostidaho/dynmen-scripts",
 

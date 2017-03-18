@@ -1,6 +1,6 @@
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 project_dir := $(dir $(mkfile_path))
-pkg_name := dynmen-scripts
+pkg_name := dynmen_scripts
 setup_py := $(join $(project_dir), setup.py)
 
 WHEELS = $(join $(project_dir), $(wildcard dist/dynmen_scripts*.whl))
