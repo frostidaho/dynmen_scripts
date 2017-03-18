@@ -15,7 +15,9 @@ def get_min_resolution():
     #     pass
     return min(heights)
 
-def main():
+def launch_rofi(show, *other_modi):
+    modi = (show,) + other_modi
+
     menu = Rofi()
     menu.dmenu = False
     menu.threads = 0
@@ -26,10 +28,19 @@ def main():
     menu.color_active = "argb:0000000, #6699cc, argb:0000000, #6699cc, #1b2b34"
     menu.color_urgent = "argb:0000000, #f99157, argb:0000000, #f99157, #1b2b34"
     menu.monitor = -1
-    menu.modi = "run,drun"
-    menu.show = 'run'
+    menu.modi = ','.join(modi)
+    menu.show = show
+    # menu.modi = "run,drun"
+    # menu.show = 'run'
     menu.padding = int(get_min_resolution() / 4)
     menu.pid = '/tmp/rofi_{}'.format(getenv('USER', 'nouser'))
     out = menu([])
     _exit(0)
+
+def main_run():
+    return launch_rofi('run', 'drun', 'window')
+
+def main_window():
+    return launch_rofi('window', 'run', 'drun')
+
 

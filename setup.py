@@ -21,7 +21,8 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'rofi-run = dynmen_scripts.rofi_run:main',
+            'rofi-run = dynmen_scripts.rofi_run:main_run',
+            'rofi-window = dynmen_scripts.rofi_run:main_window',
         ],
     },
     install_requires=['dynmen', 'python-xlib'],
