@@ -16,6 +16,7 @@ generated scripts it comes down to some additional imports.
 
 With that in mind use the makefile to create a wheel package
 and install it:
+
 .. code-block:: bash
 
                 make install-user
