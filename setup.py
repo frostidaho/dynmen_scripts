@@ -23,6 +23,7 @@ setup(
         'console_scripts': [
             'rofi-run = dynmen_scripts.rofi_run:main_run',
             'rofi-window = dynmen_scripts.rofi_run:main_window',
+            'dyn-dmenu-run = dynmen_scripts.dmenu_run:main'
         ],
     },
     install_requires=['dynmen', 'python-xlib'],
