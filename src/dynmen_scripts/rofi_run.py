@@ -1,21 +1,16 @@
-from os import getenv, _exit
 from dynmen.rofi import Rofi
 from Xlib.display import Display
 
-def get_min_resolution():
-    disp = Display(getenv('DISPLAY', ':0'))
-    n_screens = disp.screen_count()
+def get_min_resolution(display):
+    n_screens = display.screen_count()
     heights = set()
     for idx in range(n_screens):
-        screen = disp.screen(idx)
+        screen = display.screen(idx)
         heights.add(screen['height_in_pixels'])
-    # try:
-    #     disp.close()
-    # except:
-    #     pass
     return min(heights)
 
 def launch_rofi(show, *other_modi):
+    from os import getenv, _exit
     modi = (show,) + other_modi
 
     menu = Rofi()
@@ -30,17 +25,18 @@ def launch_rofi(show, *other_modi):
     menu.monitor = -1
     menu.modi = ','.join(modi)
     menu.show = show
-    # menu.modi = "run,drun"
-    # menu.show = 'run'
-    menu.padding = int(get_min_resolution() / 4)
     menu.pid = '/tmp/rofi_{}'.format(getenv('USER', 'nouser'))
-    out = menu([])
+
+    display = Display(getenv('DISPLAY', ':0'))
+    menu.padding = int(get_min_resolution(display) / 4)
+
+    menu()
+    display.close()
     _exit(0)
 
 def main_run():
-    return launch_rofi('run', 'drun', 'window')
+    launch_rofi('run', 'drun', 'window')
 
 def main_window():
-    return launch_rofi('window', 'run', 'drun')
-
+    launch_rofi('window', 'run', 'drun')
 
