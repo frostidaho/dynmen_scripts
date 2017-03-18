@@ -17,7 +17,7 @@ setuptools.setup(
             'rofi-run = dynmen_scripts.rofi_run:main',
         ],
     },
-    install_requires=[],
+    install_requires=['dynmen', 'python-xlib'],
 
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
