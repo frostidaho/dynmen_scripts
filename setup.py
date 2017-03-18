@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from distutils.core import setup
 from setuptools import find_packages
+from glob import glob
 
 setup(
     name="dynmen_scripts",
@@ -13,7 +14,11 @@ setup(
     description="A collection of scripts using dynmen",
     long_description=open('README.rst').read(),
 
-    packages=find_packages(),
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
+    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
+
+
     entry_points={
         'console_scripts': [
             'rofi-run = dynmen_scripts.rofi_run:main',

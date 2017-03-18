@@ -1,24 +1,27 @@
+pkg_name := dynmen_scripts
+
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 project_dir := $(dir $(mkfile_path))
-pkg_name := dynmen_scripts
+src_dir := $(join $(project_dir), src/$(pkg_name)/)
 setup_py := $(join $(project_dir), setup.py)
-
-WHEELS = $(join $(project_dir), $(wildcard dist/dynmen_scripts*.whl))
+# The following regex based on: http://unix.stackexchange.com/a/146752
+pkg_version := $(shell grep -oP 'version="\K[^"]+' $(setup_py))
+dist_dir := $(join $(project_dir), dist/)
+wheel := $(join $(dist_dir), $(pkg_name)-$(pkg_version)-py2.py3-none-any.whl)
+python_src = $(wildcard $(src_dir)*.py)
 
 .PHONY: install-user
-install-user: build-wheel $(WHEELS) 
+install-user: $(wheel)
 	@echo "----------------------------------------"
 	@echo "Installing $(pkg_name) as $$USER"
-	@echo -e "\twheel file: " $(word 2, $^)
 	@echo "----------------------------------------"
-	pip install --user --upgrade $(word 2, $^)
+	python -m pip install --user --upgrade $(wheel)
 
-.PHONY: build-wheel
-build-wheel: clean
+$(wheel): $(python_src)
 	@echo "----------------------------------------"
-	@echo "Building wheel for $(pkg_name)"
+	@echo "Building wheel $(wheel)"
 	@echo "----------------------------------------"
-	python $(setup_py) bdist_wheel
+	@python $(setup_py) bdist_wheel
 
 .PHONY: uninstall
 uninstall:
@@ -26,14 +29,13 @@ uninstall:
 	@echo "Uninstalling $(pkg_name)"
 	@echo "----------------------------------------"
 	@echo $(pkg_name)
-	-yes | pip uninstall $(pkg_name)
-
+	-yes | python -m pip uninstall $(pkg_name)
 
 .PHONY: clean
 clean:
 	@echo "----------------------------------------"
 	@echo "Cleaning"
 	@echo "----------------------------------------"
-	rm -rf $(project_dir)dist
+	rm -rf $(dist_dir)
 	rm -rf $(project_dir)build
-	rm -rf $(project_dir)dynmen_scripts.egg-info
+	rm -rf $(project_dir)src/*.egg-info
