@@ -64,9 +64,7 @@ def attach(pane_info):
         chmod(fpath_torun, st.st_mode | S_IEXEC)
         return run(['xfce4-terminal', '--command={}'.format(fpath_torun)])
 
-def get_display_dict():
-    d = {}
-    panes = get_panes()
+def get_display_dict(panes):
     display = []
     for pane in panes:
         session = '{} ({})'.format(pane.session_name, pane.session_id)
@@ -86,7 +84,13 @@ def main():
     menu.color_active = "argb:0000000, #6699cc, argb:0000000, #6699cc, #1b2b34"
     menu.color_urgent = "argb:0000000, #f99157, argb:0000000, #f99157, #1b2b34"
     menu.monitor = -1
-    res = menu(get_display_dict())
+
+    panes = get_panes()
+    if not panes:
+        return 1
+
+    display_dict = get_display_dict(panes)
+    res = menu(display_dict)
     res2 = attach(res.value)
     return 0
 
