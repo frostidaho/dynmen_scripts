@@ -1,8 +1,14 @@
 from dynmen.rofi import Rofi
 from subprocess import run, PIPE, Popen
 from collections import namedtuple
+import tabulate as tab
 from tabulate import tabulate
 from os import path
+import re
+
+invis = r"\x1b\[\d+[;\d]*m|\x1b\[\d*\;\d*\;\d*m"
+tags = [invis, '<b>', '</b>', '<u>', '</u>', '<i>', '</i>']
+tab._invisible_codes = re.compile('|'.join(tags))
 
 HOME_DIR = path.expanduser('~')
 PaneInfo = namedtuple(
@@ -81,10 +87,9 @@ def get_display_dict(panes):
         total = [session, path, cmd, idx]
         display.append(total)
     headers = ('Session', 'Path', 'Cmd', 'Window/Pane')
+    headers = ['<b>'+x+'</b>' for x in headers]
     display = tabulate(display, tablefmt='plain', headers=headers).strip().splitlines()
     formatted_header, *display = display
-    from re import sub
-    formatted_header = sub('(?P<word>\w+)', '<b>\g<word></b>', formatted_header)
     return formatted_header, dict(zip(display, panes))
 
 def main():
@@ -97,6 +102,7 @@ def main():
     menu.separator_style = 'dash'
     menu.prompt = 'Launch: '
     menu.monitor = -1
+    # menu.markup_rows = True
 
     panes = get_panes()
     if not panes:
