@@ -90,5 +90,3 @@ def main():
     res2 = attach(res.value)
     return 0
 
-if __name__ == '__main__':
-    res = main()

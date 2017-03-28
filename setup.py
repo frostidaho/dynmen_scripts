@@ -24,6 +24,7 @@ setup(
             'rofi-run = dynmen_scripts.rofi_run:main_run',
             'rofi-window = dynmen_scripts.rofi_run:main_window',
             'dyn-dmenu-run = dynmen_scripts.dmenu_run:main',
+            'dyn-tmux-sessions = dynmen_scripts.tmux_sessions:main',
             'xquery = dynmen_scripts.xquery:main',
         ],
     },
