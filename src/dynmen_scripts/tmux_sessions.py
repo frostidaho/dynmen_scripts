@@ -77,11 +77,15 @@ def get_display_dict(panes):
         session = '{} ({})'.format(pane.session_name, pane.session_id)
         path = pane.pane_current_path.replace(HOME_DIR, '~')
         cmd = pane.pane_current_command
-        idx = '{}/{}'.format(pane.pane_index, pane.window_index)
+        idx = '{}/{}'.format(pane.window_index, pane.pane_index)
         total = [session, path, cmd, idx]
         display.append(total)
-    display = tabulate(display, tablefmt='plain').strip().splitlines()
-    return dict(zip(display, panes))
+    headers = ('Session', 'Path', 'Cmd', 'Window/Pane')
+    display = tabulate(display, tablefmt='plain', headers=headers).strip().splitlines()
+    formatted_header, *display = display
+    from re import sub
+    formatted_header = sub('(?P<word>\w+)', '<b>\g<word></b>', formatted_header)
+    return formatted_header, dict(zip(display, panes))
 
 def main():
     menu = Rofi()
@@ -90,13 +94,16 @@ def main():
     menu.color_normal = "argb:0000000, #ffffff, argb:0000000, #fac863, #1b2b34"
     menu.color_active = "argb:0000000, #6699cc, argb:0000000, #6699cc, #1b2b34"
     menu.color_urgent = "argb:0000000, #f99157, argb:0000000, #f99157, #1b2b34"
+    menu.separator_style = 'dash'
+    menu.prompt = 'Launch: '
     menu.monitor = -1
 
     panes = get_panes()
     if not panes:
         return 1
 
-    display_dict = get_display_dict(panes)
+    header, display_dict = get_display_dict(panes)
+    menu.mesg = header
     res = menu(display_dict)
     res2 = attach(res.value)
     return 0
