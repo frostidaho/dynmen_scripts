@@ -39,6 +39,7 @@ tmux source '{tmux_commands_path}'
 tmux_commands_template = '''
 attach -t "{session_id}"
 select-window -t "{window_index}"
+select-pane -t {pane_index}
 '''
 
 def attach(pane_info):
@@ -62,7 +63,13 @@ def attach(pane_info):
             fscript.write(ttyscript)
         st = stat(fpath_torun)
         chmod(fpath_torun, st.st_mode | S_IEXEC)
-        return run(['xfce4-terminal', '--command={}'.format(fpath_torun)])
+        cmd = [
+            'xfce4-terminal',
+            '--show-borders',
+            '--maximize',
+            '--command={}'.format(fpath_torun),
+        ]
+        return run(cmd)
 
 def get_display_dict(panes):
     display = []
