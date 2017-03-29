@@ -4,6 +4,7 @@ from collections import namedtuple, OrderedDict
 import tabulate as tab
 from tabulate import tabulate
 from os import path
+from functools import partial
 import re
 
 invis = r"\x1b\[\d+[;\d]*m|\x1b\[\d*\;\d*\;\d*m"
@@ -96,10 +97,31 @@ def get_display_dict(panes):
     # display = tabulate(display, tablefmt='plain', headers=headers).strip().splitlines()
     display = tabulate(display, tablefmt='plain').strip().splitlines()
     # formatted_header, *display = display
+    panes = [partial(attach, x) for x in panes]
     return dict(zip(display, panes))
     # return formatted_header, dict(zip(display, panes))
 
+def new_session(name, systemd=False):
+    cmd = ['tmux', 'new-session', '-d', '-s', name]
+    if systemd:
+        systemd_cmd = ['systemd-run', '--scope', '--user']
+        systemd_cmd.extend(cmd)
+        return run(systemd_cmd)
+    return run(cmd)
 
+def query(menu, prompt):
+    menu.prompt = prompt
+    menu.lines = 1
+    res = menu()
+    return res.selected
+
+def query_new_session(menu, systemd=False):
+    name = query(menu, 'New session name: ').strip()
+    new_session(name, systemd)
+    panes = [x for x in get_panes() if x.session_name == name]
+    attach(panes[0])
+    
+    
 def main():
     menu = Rofi()
     menu.font = 'Dejavu Sans Mono 14'
@@ -117,7 +139,10 @@ def main():
         display_dict = get_display_dict(panes)
     else:
         display_dict = {}
-    res = menu(display_dict)
-    res2 = attach(res.value)
+    d = OrderedDict(display_dict.items())
+    d['• Create session'] = partial(query_new_session, menu)
+    res = menu(d)
+    # res2 = attach(res.value)
+    res2 = res.value()
     return 0
 
