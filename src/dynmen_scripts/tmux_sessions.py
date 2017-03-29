@@ -1,9 +1,9 @@
 from dynmen.rofi import Rofi
-from subprocess import run, PIPE, Popen
+from subprocess import run, PIPE
 from collections import namedtuple, OrderedDict
 import tabulate as tab
 from tabulate import tabulate
-from os import path
+from os import path, chdir
 from functools import partial
 import re
 
@@ -12,6 +12,7 @@ import re
 # tab._invisible_codes = re.compile('|'.join(tags))
 
 HOME_DIR = path.expanduser('~')
+chdir(HOME_DIR)
 PaneInfo = namedtuple(
     'PaneInfo',
     (
