@@ -39,3 +39,11 @@ clean:
 	rm -rf $(dist_dir)
 	rm -rf $(project_dir)build
 	rm -rf $(project_dir)src/*.egg-info
+	rm -rf $(project_dir).venv/
+
+.PHONY: venv
+venv: .venv;
+
+.venv:
+	util/new_venv.sh
+
