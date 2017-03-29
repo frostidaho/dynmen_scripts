@@ -1,6 +1,6 @@
 from dynmen.rofi import Rofi
 from subprocess import run, PIPE, Popen
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 import tabulate as tab
 from tabulate import tabulate
 from os import path
@@ -20,6 +20,8 @@ PaneInfo = namedtuple(
         'pane_current_path',
         'pane_current_command',
         'session_name',
+        'pane_title',
+        'window_name',
     ),
 )
 
@@ -77,17 +79,20 @@ def attach(pane_info):
         ]
         return run(cmd)
 
+od = OrderedDict()
+od['Session'] = '{session_name} ({session_id})'
+od['Path'] = '{path}'
+od['Cmd'] = '{pane_current_command}'
+od['Window/Pane'] = '{window_index}/{pane_index}'
+
 def get_display_dict(panes):
     display = []
+    template = list(od.values())
     for pane in panes:
-        session = '{} ({})'.format(pane.session_name, pane.session_id)
-        path = pane.pane_current_path.replace(HOME_DIR, '~')
-        cmd = pane.pane_current_command
-        idx = '{}/{}'.format(pane.window_index, pane.pane_index)
-        total = [session, path, cmd, idx]
-        display.append(total)
-    headers = ('Session', 'Path', 'Cmd', 'Window/Pane')
-    headers = ['<b>'+x+'</b>' for x in headers]
+        d = pane._asdict()
+        d['path'] = d['pane_current_path'].replace(HOME_DIR, '~')
+        display.append([x.format(**d) for x in template])
+    headers = list(od.keys())
     display = tabulate(display, tablefmt='plain', headers=headers).strip().splitlines()
     formatted_header, *display = display
     return formatted_header, dict(zip(display, panes))
