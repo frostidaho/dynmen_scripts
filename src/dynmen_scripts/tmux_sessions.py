@@ -79,23 +79,26 @@ def attach(pane_info):
         ]
         return run(cmd)
 
-od = OrderedDict()
-od['Session'] = '{session_name} ({session_id})'
-od['Path'] = '{path}'
-od['Cmd'] = '{pane_current_command}'
-od['Window/Pane'] = '{window_index}/{pane_index}'
+session_template = OrderedDict()
+session_template['Session'] = '{session_name} ({session_id})'
+session_template['Path'] = '{path}'
+session_template['Cmd'] = '{pane_current_command}'
+session_template['Window/Pane'] = '{window_index}/{pane_index}'
 
 def get_display_dict(panes):
     display = []
-    template = list(od.values())
+    template = list(session_template.values())
     for pane in panes:
         d = pane._asdict()
         d['path'] = d['pane_current_path'].replace(HOME_DIR, '~')
         display.append([x.format(**d) for x in template])
-    headers = list(od.keys())
-    display = tabulate(display, tablefmt='plain', headers=headers).strip().splitlines()
-    formatted_header, *display = display
-    return formatted_header, dict(zip(display, panes))
+    # headers = list(session_template.keys())
+    # display = tabulate(display, tablefmt='plain', headers=headers).strip().splitlines()
+    display = tabulate(display, tablefmt='plain').strip().splitlines()
+    # formatted_header, *display = display
+    return dict(zip(display, panes))
+    # return formatted_header, dict(zip(display, panes))
+
 
 def main():
     menu = Rofi()
@@ -110,11 +113,10 @@ def main():
     # menu.markup_rows = True
 
     panes = get_panes()
-    if not panes:
-        return 1
-
-    header, display_dict = get_display_dict(panes)
-    menu.mesg = header
+    if panes:
+        display_dict = get_display_dict(panes)
+    else:
+        display_dict = {}
     res = menu(display_dict)
     res2 = attach(res.value)
     return 0
