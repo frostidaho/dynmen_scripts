@@ -97,7 +97,7 @@ def get_display_dict(panes):
     # display = tabulate(display, tablefmt='plain', headers=headers).strip().splitlines()
     display = tabulate(display, tablefmt='plain').strip().splitlines()
     # formatted_header, *display = display
-    panes = [partial(attach, x) for x in panes]
+    # panes = [partial(attach, x) for x in panes]
     return dict(zip(display, panes))
     # return formatted_header, dict(zip(display, panes))
 
@@ -107,6 +107,12 @@ def new_session(name, systemd=False):
         systemd_cmd = ['systemd-run', '--scope', '--user']
         systemd_cmd.extend(cmd)
         return run(systemd_cmd)
+    return run(cmd)
+
+def kill_pane(pane_info):
+    d = pane_info._asdict()
+    fmt = '{session_id}:{window_index}.{pane_index}'
+    cmd = ['tmux', 'kill-pane', '-t', fmt.format(**d)]
     return run(cmd)
 
 def query(menu, prompt):
@@ -121,6 +127,12 @@ def query_new_session(menu, systemd=False):
     panes = [x for x in get_panes() if x.session_name == name]
     attach(panes[0])
     
+def query_kill_pane(menu):
+    panes = get_panes()
+    display_dict = get_display_dict(panes)
+    res = menu(display_dict)
+    pane_info = res.value
+    kill_pane(pane_info)
     
 def main():
     menu = Rofi()
@@ -132,15 +144,21 @@ def main():
     menu.separator_style = 'dash'
     menu.prompt = 'Launch: '
     menu.monitor = -1
+    menu.i = True
     # menu.markup_rows = True
 
     panes = get_panes()
+    d = OrderedDict()
     if panes:
         display_dict = get_display_dict(panes)
     else:
         display_dict = {}
-    d = OrderedDict(display_dict.items())
-    d['• Create session'] = partial(query_new_session, menu)
+    for k,v in display_dict.items():
+        d[k] = partial(attach, v)
+    
+    d['• Create session'] = partial(query_new_session, menu, False)
+    d['• Create persistent session'] = partial(query_new_session, menu, True)
+    d['• Kill pane'] = partial(query_kill_pane, menu)
     res = menu(d)
     # res2 = attach(res.value)
     res2 = res.value()
