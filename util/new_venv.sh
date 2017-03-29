@@ -15,6 +15,7 @@ source "$VENVPATH/bin/activate"
 # echo $(which pip)
 pip install -e "$DIR"
 pip install --ignore-installed ipython
-pip install --ignore-installed jedi
+pip install --ignore-installed dynmen
+pip install --ignore-installed python-xlib
 deactivate
 
