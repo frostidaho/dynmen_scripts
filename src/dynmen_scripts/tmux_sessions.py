@@ -93,13 +93,8 @@ def get_display_dict(panes):
         d = pane._asdict()
         d['path'] = d['pane_current_path'].replace(HOME_DIR, '~')
         display.append([x.format(**d) for x in template])
-    # headers = list(session_template.keys())
-    # display = tabulate(display, tablefmt='plain', headers=headers).strip().splitlines()
     display = tabulate(display, tablefmt='plain').strip().splitlines()
-    # formatted_header, *display = display
-    # panes = [partial(attach, x) for x in panes]
     return dict(zip(display, panes))
-    # return formatted_header, dict(zip(display, panes))
 
 def new_session(name, systemd=False):
     cmd = ['tmux', 'new-session', '-d', '-s', name]
@@ -161,7 +156,6 @@ def main():
     d['• Create persistent session'] = partial(query_new_session, menu, True)
     d['• Kill pane'] = partial(query_kill_pane, menu)
     res = menu(d)
-    # res2 = attach(res.value)
     res2 = res.value()
     return 0
 
