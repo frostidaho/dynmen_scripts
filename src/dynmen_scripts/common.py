@@ -8,7 +8,7 @@ def get_rofi(prompt='Launch: '):
     menu.color_active = "argb:0000000, #6699cc, argb:0000000, #6699cc, #1b2b34"
     menu.color_urgent = "argb:0000000, #f99157, argb:0000000, #f99157, #1b2b34"
     menu.monitor = -1
-    menu.separator_style = 'dash'
+    # menu.separator_style = 'dash'
     menu.prompt = prompt
     menu.i = True
     return menu
