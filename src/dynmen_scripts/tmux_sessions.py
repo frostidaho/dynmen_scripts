@@ -7,9 +7,9 @@ from os import path
 from functools import partial
 import re
 
-invis = r"\x1b\[\d+[;\d]*m|\x1b\[\d*\;\d*\;\d*m"
-tags = [invis, '<b>', '</b>', '<u>', '</u>', '<i>', '</i>']
-tab._invisible_codes = re.compile('|'.join(tags))
+# invis = r"\x1b\[\d+[;\d]*m|\x1b\[\d*\;\d*\;\d*m"
+# tags = [invis, '<b>', '</b>', '<u>', '</u>', '<i>', '</i>']
+# tab._invisible_codes = re.compile('|'.join(tags))
 
 HOME_DIR = path.expanduser('~')
 PaneInfo = namedtuple(
@@ -128,6 +128,7 @@ def query_new_session(menu, systemd=False):
     attach(panes[0])
     
 def query_kill_pane(menu):
+    menu.prompt = 'Select pane to kill: '
     panes = get_panes()
     display_dict = get_display_dict(panes)
     res = menu(display_dict)
