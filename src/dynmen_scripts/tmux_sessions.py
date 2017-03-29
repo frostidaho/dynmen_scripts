@@ -1,4 +1,3 @@
-from dynmen.rofi import Rofi
 from subprocess import run, PIPE
 from collections import namedtuple, OrderedDict
 import tabulate as tab
@@ -132,17 +131,8 @@ def query_kill_pane(menu):
     kill_pane(pane_info)
     
 def main():
-    menu = Rofi()
-    menu.font = 'Dejavu Sans Mono 14'
-    menu.color_window = "argb:dc222222, #fac863, #fac863"
-    menu.color_normal = "argb:0000000, #ffffff, argb:0000000, #fac863, #1b2b34"
-    menu.color_active = "argb:0000000, #6699cc, argb:0000000, #6699cc, #1b2b34"
-    menu.color_urgent = "argb:0000000, #f99157, argb:0000000, #f99157, #1b2b34"
-    menu.separator_style = 'dash'
-    menu.prompt = 'Launch: '
-    menu.monitor = -1
-    menu.i = True
-    # menu.markup_rows = True
+    from .common import get_rofi
+    menu = get_rofi()
 
     panes = get_panes()
     d = OrderedDict()
