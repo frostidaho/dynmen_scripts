@@ -1,11 +1,9 @@
 from subprocess import run, PIPE
 from collections import namedtuple, OrderedDict
-import tabulate as tab
 from tabulate import tabulate
 from os import path, chdir
 from functools import partial
-import re
-
+# import re
 # invis = r"\x1b\[\d+[;\d]*m|\x1b\[\d*\;\d*\;\d*m"
 # tags = [invis, '<b>', '</b>', '<u>', '</u>', '<i>', '</i>']
 # tab._invisible_codes = re.compile('|'.join(tags))
