@@ -131,10 +131,12 @@ def query_new_session(menu, systemd=False):
 def query_kill_pane(menu):
     menu.prompt = 'Select pane to kill: '
     panes = get_panes()
-    display_dict = get_display_dict(panes)
-    res = menu(display_dict)
-    pane_info = res.value
-    kill_pane(pane_info)
+    while panes:
+        display_dict = get_display_dict(panes)
+        res = menu(display_dict)
+        pane_info = res.value
+        kill_pane(pane_info)
+        panes = get_panes()
     
 def main():
     from .common import get_rofi
