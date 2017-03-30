@@ -25,20 +25,19 @@ PaneInfo = namedtuple(
     ),
 )
 
-_pane_format_sep = " !@^@! "
-def _pane_format():
-    frmt = ('#{{{}}}'.format(x) for x in PaneInfo._fields)
-    return _pane_format_sep.join(frmt)
-_pane_format = _pane_format()
-
-def get_panes():
-    sep = _pane_format_sep
-    cmd = ['tmux', 'list-panes', '-a', '-F', _pane_format]
-    res = run(cmd, stdout=PIPE)
-    lines = res.stdout.decode().splitlines()
-    lines = [x.split(sep) for x in lines]
-    make = PaneInfo._make
-    return [make(x) for x in lines]
+def _make_get_panes():
+    pane_format_sep = " !@^@! "
+    pane_format = pane_format_sep.join(('#{{{}}}'.format(x) for x in PaneInfo._fields))
+    cmd = ['tmux', 'list-panes', '-a', '-F', pane_format]
+    def get_panes():
+        sep = pane_format_sep
+        res = run(cmd, stdout=PIPE)
+        lines = res.stdout.decode().splitlines()
+        lines = [x.split(sep) for x in lines]
+        make = PaneInfo._make
+        return [make(x) for x in lines]
+    return get_panes
+get_panes = _make_get_panes()
 
 tty_script_template = """
 #!/usr/bin/sh
@@ -86,21 +85,26 @@ def attach(pane_info):
         ]
         return run(cmd)
 
-session_template = OrderedDict()
-session_template['Session'] = '{session_name} ({session_id})'
-session_template['Path'] = '{path}'
-session_template['Cmd'] = '{pane_current_command}'
-session_template['Window/Pane'] = '{window_index}/{pane_index}'
 
-def get_display_dict(panes):
-    display = []
-    template = list(session_template.values())
-    for pane in panes:
-        d = pane._asdict()
-        d['path'] = d['pane_current_path'].replace(HOME_DIR, '~')
-        display.append([x.format(**d) for x in template])
-    display = tabulate(display, tablefmt='plain').strip().splitlines()
-    return dict(zip(display, panes))
+class DisplayPanes(object):
+    display_template = OrderedDict()
+    display_template['Session'] = '{session_name} ({session_id})'
+    display_template['Path'] = '{path}'
+    display_template['Cmd'] = '{pane_current_command}'
+    display_template['Window/Pane'] = '{window_index}/{pane_index}'
+    display_template_vals = tuple(display_template.values())
+
+    @classmethod
+    def create_dict(cls, panes):
+        template = cls.display_template_vals
+        display = []
+        for pane in panes:
+            d = pane._asdict()
+            d['path'] = d['pane_current_path'].replace(HOME_DIR, '~')
+            display.append([x.format(**d) for x in template])
+        display = tabulate(display, tablefmt='plain').strip().splitlines()
+        return OrderedDict(zip(display, panes))
+get_display_dict = DisplayPanes.create_dict
 
 def new_session(name, systemd=False):
     cmd = ['tmux', 'new-session', '-d', '-s', name]
@@ -141,6 +145,7 @@ def query_kill_pane(menu):
 def main():
     from .common import get_rofi
     menu = get_rofi()
+    menu.fullscreen = True
 
     panes = get_panes()
     d = OrderedDict()
