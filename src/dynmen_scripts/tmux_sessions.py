@@ -3,6 +3,7 @@ from collections import namedtuple, OrderedDict
 from tabulate import tabulate
 from os import path, chdir
 from functools import partial
+from contextlib import contextmanager
 # import re
 # invis = r"\x1b\[\d+[;\d]*m|\x1b\[\d*\;\d*\;\d*m"
 # tags = [invis, '<b>', '</b>', '<u>', '</u>', '<i>', '</i>']
@@ -51,7 +52,8 @@ select-window -t "{window_index}"
 select-pane -t {pane_index}
 '''
 
-def attach(pane_info):
+@contextmanager
+def attach_script(pane_info):
     from tempfile import TemporaryDirectory
     from stat import S_IEXEC
     from os import getenv, chmod, stat
@@ -72,11 +74,15 @@ def attach(pane_info):
             fscript.write(ttyscript)
         st = stat(fpath_torun)
         chmod(fpath_torun, st.st_mode | S_IEXEC)
+        yield fpath_torun
+
+def attach(pane_info):
+    with attach_script(pane_info) as script_path:
         cmd = [
             'xfce4-terminal',
             '--show-borders',
             '--maximize',
-            '--command={}'.format(fpath_torun),
+            '--command={}'.format(script_path),
         ]
         return run(cmd)
 
