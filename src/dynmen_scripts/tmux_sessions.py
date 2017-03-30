@@ -24,13 +24,15 @@ PaneInfo = namedtuple(
     ),
 )
 
+_pane_format_sep = " !@^@! "
+def _pane_format():
+    frmt = ('#{{{}}}'.format(x) for x in PaneInfo._fields)
+    return _pane_format_sep.join(frmt)
+_pane_format = _pane_format()
+
 def get_panes():
-    sep = " !@^@! "
-    cmd = ['tmux', 'list-panes', '-a', '-F']
-    info = PaneInfo._fields
-    args = ['#{{{}}}'.format(x) for x in info]
-    args = sep.join(args)
-    cmd.append(args)
+    sep = _pane_format_sep
+    cmd = ['tmux', 'list-panes', '-a', '-F', _pane_format]
     res = run(cmd, stdout=PIPE)
     lines = res.stdout.decode().splitlines()
     lines = [x.split(sep) for x in lines]
