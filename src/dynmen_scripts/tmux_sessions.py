@@ -85,18 +85,15 @@ def attach(pane_info):
         ]
         return run(cmd)
 
-
-class DisplayPanes(object):
+def _make_get_display_dict():
     display_template = OrderedDict()
     display_template['Session'] = '{session_name} ({session_id})'
     display_template['Path'] = '{path}'
     display_template['Cmd'] = '{pane_current_command}'
     display_template['Window/Pane'] = '{window_index}/{pane_index}'
     display_template_vals = tuple(display_template.values())
-
-    @classmethod
-    def create_dict(cls, panes):
-        template = cls.display_template_vals
+    def get_display_dict(panes):
+        template = display_template_vals
         display = []
         for pane in panes:
             d = pane._asdict()
@@ -104,7 +101,8 @@ class DisplayPanes(object):
             display.append([x.format(**d) for x in template])
         display = tabulate(display, tablefmt='plain').strip().splitlines()
         return OrderedDict(zip(display, panes))
-get_display_dict = DisplayPanes.create_dict
+    return get_display_dict
+get_display_dict = _make_get_display_dict()
 
 def new_session(name, systemd=False):
     cmd = ['tmux', 'new-session', '-d', '-s', name]
