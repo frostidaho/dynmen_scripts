@@ -47,17 +47,25 @@ select-window -t "{window_index}"
 select-pane -t {pane_index}
 '''
 
+tmux_attach_template = """
+#!/usr/bin/sh
+tmux attach || systemd-run --scope --user tmux new -s default
+"""
 
+NO_PANE = PaneInfo._make((None for i in range(len(PaneInfo._fields))))
 
 
 def attach(pane_info):
     files = []
     add = files.append
-    d_pane = pane_info._asdict()
-    tmux_file = 'tmuxcmds.conf'
-    d_pane['tmux_file'] = tmux_file
-    add(FileInfo('torun', tty_script_template.format(**d_pane), True))
-    add(FileInfo(tmux_file, tmux_commands_template.format(**d_pane), False))
+    if pane_info == NO_PANE:
+        files.append(FileInfo('torun', tmux_attach_template, True))
+    else:
+        d_pane = pane_info._asdict()
+        tmux_file = 'tmuxcmds.conf'
+        d_pane['tmux_file'] = tmux_file
+        add(FileInfo('torun', tty_script_template.format(**d_pane), True))
+        add(FileInfo(tmux_file, tmux_commands_template.format(**d_pane), False))
     with scripts(*files) as script_info:
         path, name = script_info
         cmd = [
@@ -132,7 +140,7 @@ def _make_main():
     part = partial
 
     pre = OrderedDict()
-    # pre['• Attach to last session'] = 37
+    pre['• Attach to last session (or spawn one if none exist)'] = part(attach, NO_PANE)
     post = OrderedDict()
 
     post['• Create session'] = part(query_new_session, menu, False)
