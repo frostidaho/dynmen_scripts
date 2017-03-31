@@ -49,6 +49,7 @@ select-pane -t {pane_index}
 
 tmux_attach_template = """
 #!/usr/bin/sh
+cd ~/
 tmux attach || systemd-run --scope --user tmux new -s default
 """
 
