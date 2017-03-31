@@ -21,5 +21,5 @@ def scripts(main_file, *files):
             if file_info.executable:
                 st = os.stat(path)
                 os.chmod(path, st.st_mode | S_IEXEC)
-        yield path_join(td, main_file.name)
+        yield td, main_file.name
 
