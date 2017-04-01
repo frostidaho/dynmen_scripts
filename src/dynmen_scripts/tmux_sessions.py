@@ -55,6 +55,7 @@ tmux attach || systemd-run --scope --user tmux new -s default
 
 NO_PANE = PaneInfo._make((None for i in range(len(PaneInfo._fields))))
 
+from .tmux import terminal
 
 def attach(pane_info):
     files = []
@@ -69,12 +70,14 @@ def attach(pane_info):
         add(FileInfo(tmux_file, tmux_commands_template.format(**d_pane), False))
     with scripts(*files) as script_info:
         path, name = script_info
-        cmd = [
-            'xfce4-terminal',
-            '--show-borders',
-            '--maximize',
-            '--command=./{}'.format(name),
-        ]
+        # cmd = [
+        #     'xfce4-terminal',
+        #     '--show-borders',
+        #     '--maximize',
+        #     '--command=./{}'.format(name),
+        # ]
+        # cmd = terminal.xfce4('./'+name)
+        cmd = terminal.alacritty('./'+name)
         res = run(cmd, cwd=path, stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
         return res.returncode
 
