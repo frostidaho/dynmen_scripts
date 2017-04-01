@@ -1,13 +1,10 @@
-from subprocess import run, PIPE
+from subprocess import run, PIPE, DEVNULL
 from collections import namedtuple, OrderedDict
 from tabulate import tabulate
 from os import path, chdir
 from functools import partial
 from contextlib import contextmanager
-# import re
-# invis = r"\x1b\[\d+[;\d]*m|\x1b\[\d*\;\d*\;\d*m"
-# tags = [invis, '<b>', '</b>', '<u>', '</u>', '<i>', '</i>']
-# tab._invisible_codes = re.compile('|'.join(tags))
+from .utils import scripts, FileInfo
 
 HOME_DIR = path.expanduser('~')
 chdir(HOME_DIR)
@@ -41,8 +38,7 @@ get_panes = _make_get_panes()
 
 tty_script_template = """
 #!/usr/bin/sh
-tmux source '{tmux_commands_path}'
-#{shell}
+tmux source "$PWD/{tmux_file}"
 """
 
 tmux_commands_template = '''
@@ -51,39 +47,36 @@ select-window -t "{window_index}"
 select-pane -t {pane_index}
 '''
 
-@contextmanager
-def attach_script(pane_info):
-    from tempfile import TemporaryDirectory
-    from stat import S_IEXEC
-    from os import getenv, chmod, stat
+tmux_attach_template = """
+#!/usr/bin/sh
+cd ~/
+tmux attach || systemd-run --scope --user tmux new -s default
+"""
 
-    with TemporaryDirectory() as td:
-        fpath = path.join(td, 'torun.tmux')
-        fpath_torun = path.join(td, 'torun')
+NO_PANE = PaneInfo._make((None for i in range(len(PaneInfo._fields))))
 
-        with open(fpath, mode='w') as fscript:
-            tmux_commands = tmux_commands_template.format(**pane_info._asdict())
-            fscript.write(tmux_commands)
-
-        with open(fpath_torun, mode='w') as fscript:
-            ttyscript = tty_script_template.format(
-                tmux_commands_path=fpath,
-                shell=getenv('SHELL', 'bash'),
-            )
-            fscript.write(ttyscript)
-        st = stat(fpath_torun)
-        chmod(fpath_torun, st.st_mode | S_IEXEC)
-        yield fpath_torun
 
 def attach(pane_info):
-    with attach_script(pane_info) as script_path:
+    files = []
+    add = files.append
+    if pane_info == NO_PANE:
+        files.append(FileInfo('torun', tmux_attach_template, True))
+    else:
+        d_pane = pane_info._asdict()
+        tmux_file = 'tmuxcmds.conf'
+        d_pane['tmux_file'] = tmux_file
+        add(FileInfo('torun', tty_script_template.format(**d_pane), True))
+        add(FileInfo(tmux_file, tmux_commands_template.format(**d_pane), False))
+    with scripts(*files) as script_info:
+        path, name = script_info
         cmd = [
             'xfce4-terminal',
             '--show-borders',
             '--maximize',
-            '--command={}'.format(script_path),
+            '--command=./{}'.format(name),
         ]
-        return run(cmd)
+        res = run(cmd, cwd=path, stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
+        return res.returncode
 
 def _make_get_display_dict():
     display_template = OrderedDict()
@@ -99,7 +92,8 @@ def _make_get_display_dict():
             d = pane._asdict()
             d['path'] = d['pane_current_path'].replace(HOME_DIR, '~')
             display.append([x.format(**d) for x in template])
-        display = tabulate(display, tablefmt='plain').strip().splitlines()
+        display = tabulate(display, tablefmt='plain').splitlines()
+        display = ['\t'+x for x in display]
         return OrderedDict(zip(display, panes))
     return get_display_dict
 get_display_dict = _make_get_display_dict()
@@ -139,25 +133,35 @@ def query_kill_pane(menu):
         pane_info = res.value
         kill_pane(pane_info)
         panes = get_panes()
-    
-def main():
+
+def _make_main():
     from .common import get_rofi
     menu = get_rofi()
     menu.fullscreen = True
+    part = partial
 
-    panes = get_panes()
-    d = OrderedDict()
-    if panes:
-        display_dict = get_display_dict(panes)
-    else:
-        display_dict = {}
-    for k,v in display_dict.items():
-        d[k] = partial(attach, v)
-    
-    d['• Create session'] = partial(query_new_session, menu, False)
-    d['• Create persistent session'] = partial(query_new_session, menu, True)
-    d['• Kill pane'] = partial(query_kill_pane, menu)
-    res = menu(d)
-    res2 = res.value()
-    return 0
+    pre = OrderedDict()
+    pre['• Attach to last session (or spawn one if none exist)'] = part(attach, NO_PANE)
+    post = OrderedDict()
+
+    post['• Create session'] = part(query_new_session, menu, False)
+    post['• Create persistent session'] = part(query_new_session, menu, True)
+    post['• Kill pane'] = part(query_kill_pane, menu)
+
+    def main():
+        panes = get_panes()
+        total = OrderedDict()
+        total.update(pre)
+
+        if panes:
+            display_dict = get_display_dict(panes)
+        else:
+            display_dict = {}
+        for k,v in display_dict.items():
+            total[k] = part(attach, v)
+        total.update(post)
+        res = menu(total).value()
+        return 0
+    return main
+main = _make_main()
 
