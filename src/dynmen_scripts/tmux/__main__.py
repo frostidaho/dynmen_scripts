@@ -1,4 +1,4 @@
-from .info import get_tmux_panes, kill_pane, new_session
+from .ctrl import get_tmux_panes, kill_pane, new_session
 from .common import NO_PANE, HOME_DIR
 from .terminal import TerminalAttach
 from functools import partial
