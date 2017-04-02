@@ -17,6 +17,13 @@ def _make_get_panes():
 get_tmux_panes = _make_get_panes()
 
 
+def kill_pane(pane_info):
+    d = pane_info._asdict()
+    fmt = '{session_id}:{window_index}.{pane_index}'
+    cmd = ['tmux', 'kill-pane', '-t', fmt.format(**d)]
+    return _sp.run(cmd)
+
+
 # if __name__ == '__main__':
 #     from timeit import timeit
 #     print('get_tmux_panes', timeit('x = get_tmux_panes()', 'from __main__ import get_tmux_panes', number=1000))

@@ -1,4 +1,4 @@
-from .info import get_tmux_panes
+from .info import get_tmux_panes, kill_pane
 from .common import NO_PANE, HOME_DIR
 from .terminal import TerminalAttach
 from functools import partial
@@ -27,12 +27,6 @@ def _make_get_display_dict():
     return get_display_dict
 get_display_dict = _make_get_display_dict()
 
-
-def kill_pane(pane_info):
-    d = pane_info._asdict()
-    fmt = '{session_id}:{window_index}.{pane_index}'
-    cmd = ['tmux', 'kill-pane', '-t', fmt.format(**d)]
-    return run(cmd)
 
 def query(menu, prompt):
     menu.prompt = prompt
