@@ -79,6 +79,7 @@ def main(args=None):
     attach = TerminalAttach(args.terminal)
     if args.directory is not None:
         attach = partial(attach, directory=args.directory)
+        menu.prompt = 'Launch (and go to {!r}): '.format(args.directory)
     pre['• Attach to last session (or spawn one if none exist)'] = part(attach, NO_PANE)
     post = OrderedDict()
 
