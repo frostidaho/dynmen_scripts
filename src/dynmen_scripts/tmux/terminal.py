@@ -82,15 +82,16 @@ class TerminalLauncher:
 class TerminalAttach(TerminalLauncher):
     def __call__(self, pane_info, directory=None):
         files = []
-        add = files.append
+        # add = files.append
         tl = templates
         if pane_info == NO_PANE:
             files.extend(tl.tmux_attach(directory))
         else:
             d_pane = pane_info._asdict()
             d_pane['directory'] = directory
-            cmds_file = tl.tmux_commands_attach(**d_pane)
-            add(tl.tmux_source(cmds_file.name))
-            add(cmds_file)
+            files.extend(tl.tmux_source(**d_pane))
+            # cmds_file = tl.tmux_commands_attach(**d_pane)
+            # add(tl.tmux_source(cmds_file.name))
+            # add(cmds_file)
         return super().__call__(*files)
 
