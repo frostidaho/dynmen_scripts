@@ -23,6 +23,14 @@ def kill_pane(pane_info):
     cmd = ['tmux', 'kill-pane', '-t', fmt.format(**d)]
     return _sp.run(cmd)
 
+def new_session(name, systemd=False):
+    cmd = ['tmux', 'new-session', '-d', '-s', name]
+    if systemd:
+        systemd_cmd = ['systemd-run', '--scope', '--user']
+        systemd_cmd.extend(cmd)
+        return _sp.run(systemd_cmd)
+    return _sp.run(cmd)
+
 
 # if __name__ == '__main__':
 #     from timeit import timeit
