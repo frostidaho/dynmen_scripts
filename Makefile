@@ -40,6 +40,7 @@ clean:
 	rm -rf $(project_dir)build
 	rm -rf $(project_dir)src/*.egg-info
 	rm -rf $(project_dir).venv/
+	git clean -dxf
 
 .PHONY: venv
 venv: .venv;
