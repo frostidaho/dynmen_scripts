@@ -1,4 +1,4 @@
-from .common import NO_PANE, FileInfo, Register
+from .common import NO_PANE, Register
 from . import templates
 from itertools import chain
 import subprocess as _sp
@@ -78,6 +78,9 @@ class TerminalLauncher:
             res = run(cmd, cwd=path, stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
             return res.returncode
 
+
+from collections import namedtuple as _namedtuple
+FileInfo = _namedtuple('FileInfo', 'name contents executable')
 
 class TerminalAttach(TerminalLauncher):
     def __call__(self, pane_info):

@@ -22,7 +22,6 @@ PaneInfo = _namedtuple(
 
 NO_PANE = PaneInfo._make((None for i in range(len(PaneInfo._fields))))
 
-FileInfo = _namedtuple('FileInfo', 'name contents executable')
 HOME_DIR = _expanduser('~')
 
 
