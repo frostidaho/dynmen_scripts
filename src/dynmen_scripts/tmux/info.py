@@ -1,6 +1,5 @@
 from collections import namedtuple as _namedtuple
 import subprocess as _sp
-from subprocess import run as _run, PIPE as _PIPE, DEVNULL as _DEVNULL
 
 
 PaneInfo = _namedtuple(
