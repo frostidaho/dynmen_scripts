@@ -17,7 +17,7 @@ select-window -t "{window_index}"
 select-pane -t "{pane_index}"
 '''
 _tmux_commands_cd = """\
-tmux send-keys -t "{pane_index}" C-z 'cd {directory}' Enter
+send-keys -t "{pane_index}" C-z 'cd {directory}' Enter
 """
 def tmux_commands_attach(session_id, window_index, pane_index, directory=None, **kw):
     txt = _tmux_commands_attach.format(**locals())

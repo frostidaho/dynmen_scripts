@@ -62,6 +62,10 @@ def parse_args(args=None):
         choices=tuple(terms.registered.keys()),
         default=terms.default,
     )
+    add(
+        '-d', '--directory',
+        default=None,
+    )
     return parser.parse_args(args)
 
 def main(args=None):
@@ -73,6 +77,8 @@ def main(args=None):
 
     pre = OrderedDict()
     attach = TerminalAttach(args.terminal)
+    if args.directory is not None:
+        attach = partial(attach, directory=args.directory)
     pre['• Attach to last session (or spawn one if none exist)'] = part(attach, NO_PANE)
     post = OrderedDict()
 
