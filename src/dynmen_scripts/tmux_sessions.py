@@ -4,7 +4,8 @@ from tabulate import tabulate
 from os import path, chdir
 from functools import partial
 from contextlib import contextmanager
-from .utils import scripts, FileInfo
+from .tmux.common import FileInfo
+from .tmux.terminal import scripts
 
 HOME_DIR = path.expanduser('~')
 chdir(HOME_DIR)
