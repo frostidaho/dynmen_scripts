@@ -32,3 +32,6 @@ def _make_get_panes():
 get_tmux_panes = _make_get_panes()
 
 
+# if __name__ == '__main__':
+#     from timeit import timeit
+#     print('get_tmux_panes', timeit('x = get_tmux_panes()', 'from __main__ import get_tmux_panes', number=1000))
