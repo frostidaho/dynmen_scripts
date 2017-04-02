@@ -2,6 +2,7 @@ from weakref import WeakValueDictionary as _WeakValueDictionary
 from weakref import WeakSet as _WeakSet
 from .common import NO_PANE, FileInfo
 from itertools import chain
+import subprocess as _sp
 
 class Register:
     def __new__(cls, *args, **kwargs):
@@ -96,7 +97,9 @@ class TerminalLauncher:
     def __call__(self, main_file, *files):
         with scripts(main_file, *files) as script_info:
             path, name = script_info
-            cmd = backend('./'+name)
+            cmd = self.backend('./'+name)
+            sp = _sp
+            run, DEVNULL = sp.run, sp.DEVNULL
             res = run(cmd, cwd=path, stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
             return res.returncode
 
@@ -117,7 +120,7 @@ tmux_attach_template = """
 cd ~/
 tmux attach || systemd-run --scope --user tmux new -s default
 """
-    
+
 class TerminalAttach(TerminalLauncher):
     def __call__(self, pane_info):
         files = []
