@@ -1,3 +1,6 @@
+"""
+common.py contains some data structures and constants
+"""
 from collections import namedtuple as _namedtuple
 from os.path import expanduser as _expanduser
 
