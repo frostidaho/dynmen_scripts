@@ -85,7 +85,7 @@ class TerminalAttach(TerminalLauncher):
         add = files.append
         tl = templates
         if pane_info == NO_PANE:
-            add(tl.tmux_attach(directory))
+            files.extend(tl.tmux_attach(directory))
         else:
             d_pane = pane_info._asdict()
             d_pane['directory'] = directory

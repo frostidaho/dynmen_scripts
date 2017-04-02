@@ -26,15 +26,36 @@ def tmux_commands_attach(session_id, window_index, pane_index, directory=None, *
         txt = '\n'.join([txt, txt2])
     return FileInfo('tmux_commands_attach', txt, False)
 
-_tmux_attach = """\
+
+_tmux_attach_or_spawn = """\
 #!/usr/bin/sh
-cd {directory}
-tmux attach || systemd-run --scope --user tmux new -s default
+tmux source "$PWD/{tmux_commands_file}" || \
+    systemd-run --scope --user tmux new-session\
+                -s default\
+                -c "{directory}"
 """
+
+_tmux_commands_attach_default = '''\
+attach
+'''
+
+_tmux_commands_cd_default = """\
+send-keys C-z 'cd {directory}' Enter
+"""
+
 def tmux_attach(directory=None, **kw):
+    tmux_commands_file = 'tmux_conf'
     if directory is None:
-        directory = '~/'
-    txt = _tmux_attach.format(**locals())
-    return FileInfo('tmux_attach', txt, True)
+        directory = '$HOME'
+        tmux_conf = _tmux_commands_attach_default
+    else:
+        tmux_conf = '\n'.join([_tmux_commands_attach_default, _tmux_commands_cd_default])
+        tmux_conf = tmux_conf.format(**locals())
+
+    script = _tmux_attach_or_spawn.format(**locals())
+    return [
+        FileInfo('tmux_attach', script, True),
+        FileInfo('tmux_conf', tmux_conf, False),
+    ]
 
 
