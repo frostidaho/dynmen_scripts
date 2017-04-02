@@ -8,13 +8,13 @@ def _make_get_panes():
     cmd = ['tmux', 'list-panes', '-a', '-F', pane_format]
     run, PIPE, DEVNULL = _sp.run, _sp.PIPE, _sp.DEVNULL
     make = PaneInfo._make
-    def get_tmux_panes():
+    def get_panes():
         "Return a PaneInfo object for each available tmux pane"
         lines = run(cmd, stdout=PIPE, stderr=DEVNULL, stdin=DEVNULL) \
                                  .stdout.decode().splitlines()
         return [make(x.split(sep)) for x in lines]
-    return get_tmux_panes
-get_tmux_panes = _make_get_panes()
+    return get_panes
+get_panes = _make_get_panes()
 
 
 def kill_pane(pane_info):

@@ -1,4 +1,4 @@
-from .ctrl import get_tmux_panes, kill_pane, new_session
+from .ctrl import get_panes, kill_pane, new_session
 from .common import NO_PANE, HOME_DIR
 from .terminal import TerminalAttach
 from functools import partial
@@ -36,18 +36,18 @@ def query(menu, prompt):
 def query_new_session(menu, attach, systemd=False):
     name = query(menu, 'New session name: ').strip()
     new_session(name, systemd)
-    panes = [x for x in get_tmux_panes() if x.session_name == name]
+    panes = [x for x in get_panes() if x.session_name == name]
     attach(panes[0])
 
 def query_kill_pane(menu):
     menu.prompt = 'Select pane to kill: '
-    panes = get_tmux_panes()
+    panes = get_panes()
     while panes:
         display_dict = get_display_dict(panes)
         res = menu(display_dict)
         pane_info = res.value
         kill_pane(pane_info)
-        panes = get_tmux_panes()
+        panes = get_panes()
 
 
 def main():
@@ -65,7 +65,7 @@ def main():
     post['• Create persistent session'] = part(query_new_session, menu, attach, True)
     post['• Kill pane'] = part(query_kill_pane, menu)
 
-    panes = get_tmux_panes()
+    panes = get_panes()
     total = OrderedDict()
     total.update(pre)
 
