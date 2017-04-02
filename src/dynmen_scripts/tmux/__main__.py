@@ -34,7 +34,7 @@ def query(menu, prompt):
     res = menu()
     return res.selected
 
-def query_new_session(menu, systemd=False):
+def query_new_session(menu, attach, systemd=False):
     name = query(menu, 'New session name: ').strip()
     new_session(name, systemd)
     panes = [x for x in get_tmux_panes() if x.session_name == name]
@@ -62,8 +62,8 @@ def main():
     pre['• Attach to last session (or spawn one if none exist)'] = part(attach, NO_PANE)
     post = OrderedDict()
 
-    post['• Create session'] = part(query_new_session, menu, False)
-    post['• Create persistent session'] = part(query_new_session, menu, True)
+    post['• Create session'] = part(query_new_session, menu, attach, False)
+    post['• Create persistent session'] = part(query_new_session, menu, attach, True)
     post['• Kill pane'] = part(query_kill_pane, menu)
 
     panes = get_tmux_panes()
