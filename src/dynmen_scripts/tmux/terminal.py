@@ -3,6 +3,8 @@ from weakref import WeakSet as _WeakSet
 from .common import NO_PANE, FileInfo
 from itertools import chain
 import subprocess as _sp
+from shutil import which as _which
+from functools import partial as _partial
 
 class Register:
     def __new__(cls, *args, **kwargs):
@@ -39,8 +41,15 @@ class Register:
 
 register_terminal = Register('terminal')
 
+def _maybe_register(executable, **kw):
+    if _which(executable):
+        return _partial(register_terminal, **kw)
+    else:
+        def wrapper(fn, *args, **kwargs):
+            return fn
+        return wrapper
 
-@register_terminal
+@_maybe_register('xfce4-terminal')
 def xfce4(script_path):
     cmd = [
         'xfce4-terminal',
@@ -50,7 +59,7 @@ def xfce4(script_path):
     ]
     return cmd
 
-@register_terminal
+@_maybe_register('alacritty', default=True)
 def alacritty(script_path):
     return ['alacritty', '-e', script_path]
 
