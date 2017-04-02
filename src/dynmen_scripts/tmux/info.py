@@ -1,22 +1,7 @@
 from collections import namedtuple as _namedtuple
 import subprocess as _sp
 
-
-PaneInfo = _namedtuple(
-    'PaneInfo',
-    (
-        'session_id',
-        'window_index',
-        'pane_index',
-        'pane_current_path',
-        'pane_current_command',
-        'session_name',
-        'pane_title',
-        'window_name',
-    ),
-)
-
-NO_PANE = PaneInfo._make((None for i in range(len(PaneInfo._fields))))
+from .common import PaneInfo
 
 def _make_get_panes():
     sep = " !@^@! "
