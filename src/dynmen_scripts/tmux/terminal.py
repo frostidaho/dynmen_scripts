@@ -79,22 +79,18 @@ class TerminalLauncher:
             return res.returncode
 
 
-from collections import namedtuple as _namedtuple
-FileInfo = _namedtuple('FileInfo', 'name contents executable')
-
 class TerminalAttach(TerminalLauncher):
     def __call__(self, pane_info):
         files = []
         add = files.append
         tl = templates
         if pane_info == NO_PANE:
-            files.append(FileInfo('torun', tl.tmux_attach, True))
+            add(tl.tmux_attach())
         else:
             d_pane = pane_info._asdict()
-            tmux_file = 'tmuxcmds.conf'
-            d_pane['tmux_file'] = tmux_file
-            add(FileInfo('torun', tl.tmux_source.format(**d_pane), True))
-            add(FileInfo(tmux_file, tl.tmux_commands_attach.format(**d_pane), False))
+            cmds_file = tl.tmux_commands_attach(**d_pane)
+            add(tl.tmux_source(cmds_file.name))
+            add(cmds_file)
         return super().__call__(*files)
 
 
