@@ -83,14 +83,15 @@ class TerminalAttach(TerminalLauncher):
     def __call__(self, pane_info):
         files = []
         add = files.append
+        tl = templates
         if pane_info == NO_PANE:
-            files.append(FileInfo('torun', tmux_attach_template, True))
+            files.append(FileInfo('torun', tl.tmux_attach, True))
         else:
             d_pane = pane_info._asdict()
             tmux_file = 'tmuxcmds.conf'
             d_pane['tmux_file'] = tmux_file
-            add(FileInfo('torun', tty_script_template.format(**d_pane), True))
-            add(FileInfo(tmux_file, tmux_commands_template.format(**d_pane), False))
+            add(FileInfo('torun', tl.tmux_source.format(**d_pane), True))
+            add(FileInfo(tmux_file, tl.tmux_commands_attach.format(**d_pane), False))
         return super().__call__(*files)
 
 
