@@ -3,8 +3,22 @@ from .common import NO_PANE, HOME_DIR
 from .terminal import TerminalAttach
 from functools import partial
 from collections import OrderedDict
-from ..common import get_rofi
 
+def get_rofi(prompt='Launch: '):
+    from dynmen.rofi import Rofi
+    "Get a rofi menu object with my usual settings"
+    menu = Rofi()
+    menu.font = 'Dejavu Sans Mono 14'
+    menu.color_window = "argb:dc222222, #fac863, #fac863"
+    menu.color_normal = "argb:0000000, #ffffff, argb:0000000, #fac863, #1b2b34"
+    menu.color_active = "argb:0000000, #6699cc, argb:0000000, #6699cc, #1b2b34"
+    menu.color_urgent = "argb:0000000, #f99157, argb:0000000, #f99157, #1b2b34"
+    menu.monitor = -1
+    # menu.separator_style = 'dash'
+    menu.prompt = prompt
+    menu.i = True
+    menu.fullscreen = True
+    return menu
 
 def _make_get_display_dict():
     from tabulate import tabulate
@@ -53,7 +67,6 @@ def query_kill_pane(menu):
 
 def main():
     menu = get_rofi()
-    menu.fullscreen = True
 
     part = partial
 
