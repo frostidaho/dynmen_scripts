@@ -26,6 +26,7 @@ setup(
             'dyn-dmenu-run = dynmen_scripts.dmenu_run:main',
             'dyn-tmux-sessions = dynmen_scripts.tmux_sessions:main',
             'xquery = dynmen_scripts.xquery:main',
+            'dyn-tmux-test = dynmen_scripts.tmux.__main__:main',
         ],
     },
     install_requires=['dynmen', 'python-xlib'],
