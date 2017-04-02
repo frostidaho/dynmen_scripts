@@ -16,17 +16,25 @@ attach -t "{session_id}"
 select-window -t "{window_index}"
 select-pane -t "{pane_index}"
 '''
-def tmux_commands_attach(session_id, window_index, pane_index, **kw):
+_tmux_commands_cd = """\
+tmux send-keys -t "{pane_index}" C-z 'cd {directory}' Enter
+"""
+def tmux_commands_attach(session_id, window_index, pane_index, directory=None, **kw):
     txt = _tmux_commands_attach.format(**locals())
+    if directory is not None:
+        txt2 = _tmux_commands_cd.format(**locals())
+        txt = '\n'.join([txt, txt2])
     return FileInfo('tmux_commands_attach', txt, False)
 
-_tmux_attach = """
+_tmux_attach = """\
 #!/usr/bin/sh
-cd ~/
+cd {directory}
 tmux attach || systemd-run --scope --user tmux new -s default
 """
-def tmux_attach(**kw):
-    txt = _tmux_attach
+def tmux_attach(directory=None, **kw):
+    if directory is None:
+        directory = '~/'
+    txt = _tmux_attach.format(**locals())
     return FileInfo('tmux_attach', txt, True)
 
-    
+
