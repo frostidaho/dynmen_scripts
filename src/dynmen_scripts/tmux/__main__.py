@@ -1,6 +1,6 @@
 from .ctrl import get_panes, kill_pane, new_session
 from .common import NO_PANE, HOME_DIR
-from .terminal import TerminalAttach
+from .terminal import TerminalAttach, register_terminal
 from functools import partial
 from collections import OrderedDict
 from ..common import get_rofi
@@ -50,14 +50,29 @@ def query_kill_pane(menu):
         panes = get_panes()
 
 
-def main():
+
+def parse_args(args=None):
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    add = parser.add_argument
+    terms = register_terminal
+
+    add(
+        '-t', '--terminal',
+        choices=tuple(terms.registered.keys()),
+        default=terms.default,
+    )
+    return parser.parse_args(args)
+
+def main(args=None):
     menu = get_rofi()
     menu.fullscreen = True
-
+    args = parse_args(args)
+    print('args are', args)
     part = partial
 
     pre = OrderedDict()
-    attach = TerminalAttach()
+    attach = TerminalAttach(args.terminal)
     pre['• Attach to last session (or spawn one if none exist)'] = part(attach, NO_PANE)
     post = OrderedDict()
 
