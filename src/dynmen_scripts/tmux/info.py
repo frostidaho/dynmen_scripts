@@ -1,9 +1,8 @@
 from collections import namedtuple as _namedtuple
 import subprocess as _sp
 
-from .common import PaneInfo
-
 def _make_get_panes():
+    from .common import PaneInfo
     sep = " !@^@! "
     pane_format = sep.join(('#{{{}}}'.format(x) for x in PaneInfo._fields))
     cmd = ['tmux', 'list-panes', '-a', '-F', pane_format]
