@@ -1,5 +1,7 @@
 from weakref import WeakValueDictionary as _WeakValueDictionary
 from weakref import WeakSet as _WeakSet
+from .common import NO_PANE, FileInfo
+from itertools import chain
 
 class Register:
     def __new__(cls, *args, **kwargs):
@@ -57,7 +59,7 @@ def _make_scripts():
     from collections import OrderedDict
     from contextlib import contextmanager
     from tempfile import TemporaryDirectory
-    from itertools import chain
+    
 
     @contextmanager
     def scripts(main_file, *files):
@@ -77,14 +79,58 @@ def _make_scripts():
     return scripts
 scripts = _make_scripts()
 
-class Attach:
+
+class TerminalLauncher:
     register_terminal = register_terminal
     def __init__(self, backend=''):
         rt = self.register_terminal
-        if backend:
-            self.backend = rt[backend]
+        if isinstance(backend, str):
+            if backend:
+                fn = rt[backend]
+            else:
+                fn = rt[rt.default]
         else:
-            self.backend = rt[rt.default]
+            fn = backend
+        self.backend = fn
 
-    def __call__(self):
-        pass
+    def __call__(self, main_file, *files):
+        with scripts(main_file, *files) as script_info:
+            path, name = script_info
+            cmd = backend('./'+name)
+            res = run(cmd, cwd=path, stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
+            return res.returncode
+
+
+tty_script_template = """
+#!/usr/bin/sh
+tmux source "$PWD/{tmux_file}"
+"""
+
+tmux_commands_template = '''
+attach -t "{session_id}"
+select-window -t "{window_index}"
+select-pane -t {pane_index}
+'''
+
+tmux_attach_template = """
+#!/usr/bin/sh
+cd ~/
+tmux attach || systemd-run --scope --user tmux new -s default
+"""
+    
+class TerminalAttach(TerminalLauncher):
+    def __call__(self, pane_info):
+        files = []
+        add = files.append
+        if pane_info == NO_PANE:
+            files.append(FileInfo('torun', tmux_attach_template, True))
+        else:
+            d_pane = pane_info._asdict()
+            tmux_file = 'tmuxcmds.conf'
+            d_pane['tmux_file'] = tmux_file
+            add(FileInfo('torun', tty_script_template.format(**d_pane), True))
+            add(FileInfo(tmux_file, tmux_commands_template.format(**d_pane), False))
+        return super().__call__(*files)
+
+
+
