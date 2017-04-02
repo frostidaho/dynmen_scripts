@@ -1,3 +1,6 @@
+"""
+ctrl.py contains code to control and inspect tmux
+"""
 from collections import namedtuple as _namedtuple
 import subprocess as _sp
 
@@ -15,7 +18,6 @@ def _make_get_panes():
         return [make(x.split(sep)) for x in lines]
     return get_panes
 get_panes = _make_get_panes()
-
 
 def kill_pane(pane_info):
     "Kill the tmux pane corresponding to the given instance of PaneInfo"
