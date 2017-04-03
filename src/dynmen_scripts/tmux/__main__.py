@@ -103,3 +103,5 @@ def main(args=None):
     res = menu(total).value()
     return 0
 
+if __name__ == '__main__':
+    main()
