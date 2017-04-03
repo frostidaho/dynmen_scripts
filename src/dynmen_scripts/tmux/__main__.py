@@ -71,6 +71,7 @@ def parse_args(args=None):
 def main(args=None):
     menu = get_rofi()
     menu.fullscreen = True
+    menu.sync = True
     menu.padding = get_min_resolution() // 4
     args = parse_args(args)
     print('args are', args)
@@ -84,8 +85,8 @@ def main(args=None):
     pre['• Attach to last session (or spawn one if none exist)'] = part(attach, NO_PANE)
     post = OrderedDict()
 
-    post['• Create session'] = part(query_new_session, menu, attach, False)
-    post['• Create persistent session'] = part(query_new_session, menu, attach, True)
+    post['• New persistent session'] = part(query_new_session, menu, attach, True)
+    post['• New session'] = part(query_new_session, menu, attach, False)
     post['• Kill pane'] = part(query_kill_pane, menu)
 
     panes = get_panes()
