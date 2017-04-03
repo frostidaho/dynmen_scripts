@@ -3,7 +3,7 @@ from .common import NO_PANE, HOME_DIR
 from .terminal import TerminalAttach, register_terminal
 from functools import partial
 from collections import OrderedDict
-from ..common import get_rofi
+from ..common import get_rofi, get_min_resolution
 
 def _make_get_display_dict():
     from tabulate import tabulate
@@ -71,6 +71,7 @@ def parse_args(args=None):
 def main(args=None):
     menu = get_rofi()
     menu.fullscreen = True
+    menu.padding = get_min_resolution() // 4
     args = parse_args(args)
     print('args are', args)
     part = partial
