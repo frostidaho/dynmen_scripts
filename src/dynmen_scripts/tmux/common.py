@@ -2,9 +2,9 @@
 common.py contains some data structures and constants
 """
 from collections import namedtuple as _namedtuple
-from os.path import expanduser as _expanduser
 from weakref import WeakSet as _WeakSet
 from weakref import WeakValueDictionary as _WeakValueDictionary
+from pathlib import Path as _Path
 
 PaneInfo = _namedtuple(
     'PaneInfo',
@@ -22,8 +22,12 @@ PaneInfo = _namedtuple(
 
 NO_PANE = PaneInfo._make((None for i in range(len(PaneInfo._fields))))
 
-HOME_DIR = _expanduser('~')
-
+def dir_relative(path, basepath=_Path.home(), basename='~/'):
+    try:
+        newpath = str(_Path(path).relative_to(basepath))
+        return basename + newpath
+    except ValueError:
+        return path
 
 class Register:
     def __new__(cls, *args, **kwargs):

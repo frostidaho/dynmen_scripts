@@ -1,5 +1,5 @@
 from .ctrl import get_panes, kill_pane, new_session
-from .common import NO_PANE, HOME_DIR
+from .common import NO_PANE, dir_relative
 from .terminal import TerminalAttach, register_terminal
 from functools import partial
 from collections import OrderedDict
@@ -13,12 +13,13 @@ def _make_get_display_dict():
     display_template['Cmd'] = '{pane_current_command}'
     display_template['Window/Pane'] = '{window_index}/{pane_index}'
     display_template_vals = tuple(display_template.values())
+    drel = dir_relative
     def get_display_dict(panes):
         template = display_template_vals
         display = []
         for pane in panes:
             d = pane._asdict()
-            d['path'] = d['pane_current_path'].replace(HOME_DIR, '~')
+            d['path'] = drel(d['pane_current_path'])
             display.append([x.format(**d) for x in template])
         display = tabulate(display, tablefmt='plain').splitlines()
         display = ['\t'+x for x in display]
@@ -81,7 +82,7 @@ def main(args=None):
     attach = TerminalAttach(args.terminal)
     if args.directory is not None:
         attach = partial(attach, directory=args.directory)
-        menu.prompt = 'Launch (and go to {!r}): '.format(args.directory)
+        menu.prompt = 'Launch (and go to {!r}): '.format(dir_relative(args.directory))
     pre['• Attach to last session (or spawn one if none exist)'] = part(attach, NO_PANE)
     post = OrderedDict()
 
