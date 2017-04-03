@@ -13,3 +13,22 @@ def get_rofi(prompt='Launch: '):
     menu.i = True
     return menu
 
+def _make_get_min_res():
+    from Xlib.display import Display
+    from os import getenv
+    def get_min_resolution(DISPLAY=None):
+        if DISPLAY is None:
+            DISPLAY = getenv('DISPLAY', ':0')
+        display = Display(DISPLAY)
+        try:
+            n_screens = display.screen_count()
+            heights = set()
+            for idx in range(n_screens):
+                screen = display.screen(idx)
+                heights.add(screen['height_in_pixels'])
+            return min(heights)
+        finally:
+            display.close()
+    return get_min_resolution
+get_min_resolution = _make_get_min_res()
+
