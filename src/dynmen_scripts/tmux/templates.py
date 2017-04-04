@@ -13,6 +13,9 @@ _tmux_commands_attach = '''\
 attach -t "{session_id}"
 select-window -t "{window_index}"
 select-pane -t "{pane_index}"
+set -g set-titles on
+set -g set-titles-string '#S - dyn-tmux'
+setw -g automatic-rename off
 '''
 _tmux_commands_cd = """\
 send-keys -t "{pane_index}" C-z 'cd {directory}' Enter
@@ -38,14 +41,22 @@ def tmux_source(**kw):
 ############################################################ 
 _tmux_attach_or_spawn = """\
 #!/usr/bin/sh
-tmux source "$PWD/{tmux_commands_file}" || \
+tmux source "$PWD/{tmux_commands_file}"
+retcode=$?
+if [ $retcode -ne 0 ]; then
     systemd-run --scope --user tmux new-session\
                 -s default\
-                -c "{directory}"
+                -c "{directory}"\
+                -d
+    tmux source "$PWD/{tmux_commands_file}"
+fi
 """
 
 _tmux_commands_attach_default = '''\
 attach
+set -g set-titles on
+set -g set-titles-string '#S - dyn-tmux'
+setw -g automatic-rename off
 '''
 
 _tmux_commands_cd_default = """\
