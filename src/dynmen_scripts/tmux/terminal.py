@@ -1,4 +1,4 @@
-from .common import NO_PANE, Register
+from .common import NO_PANE, Register, term_title
 from . import templates
 from itertools import chain
 import subprocess as _sp
@@ -21,13 +21,18 @@ def xfce4(script_path):
         'xfce4-terminal',
         '--show-borders',
         '--maximize',
+        '--title={}'.format(term_title),
         '--command={}'.format(script_path),
     ]
     return cmd
 
 @_maybe_register('alacritty', default=True)
 def alacritty(script_path):
-    return ['alacritty', '-e', script_path]
+    return [
+        'alacritty',
+        '-e', script_path,
+        '-t', term_title,
+    ]
 
 def _make_scripts():
     import os
