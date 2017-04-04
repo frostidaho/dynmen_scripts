@@ -6,7 +6,7 @@ from weakref import WeakSet as _WeakSet
 from weakref import WeakValueDictionary as _WeakValueDictionary
 from pathlib import Path as _Path
 
-term_title = '- dyn-tmux'
+term_title = '+ tmux-dyn'
 PaneInfo = _namedtuple(
     'PaneInfo',
     (

@@ -1,4 +1,5 @@
 from collections import namedtuple as _namedtuple
+from .common import term_title
 FileInfo = _namedtuple('FileInfo', 'name contents executable')
 ############################################################
 # This section is for attaching to a specific session/window/pane.
@@ -14,9 +15,9 @@ attach -t "{session_id}"
 select-window -t "{window_index}"
 select-pane -t "{pane_index}"
 set -g set-titles on
-set -g set-titles-string '#S - dyn-tmux'
+set -g set-titles-string '#S @@term_title@@'
 setw -g automatic-rename off
-'''
+'''.replace('@@term_title@@', term_title)
 _tmux_commands_cd = """\
 send-keys -t "{pane_index}" C-z 'cd {directory}' Enter
 """
@@ -55,9 +56,9 @@ fi
 _tmux_commands_attach_default = '''\
 attach
 set -g set-titles on
-set -g set-titles-string '#S - dyn-tmux'
+set -g set-titles-string '#S @@term_title@@'
 setw -g automatic-rename off
-'''
+'''.replace('@@term_title@@', term_title)
 
 _tmux_commands_cd_default = """\
 send-keys C-z 'cd {directory}' Enter
