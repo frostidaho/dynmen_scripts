@@ -19,14 +19,15 @@ set -g set-titles-string '#S @@term_title@@'
 setw -g automatic-rename off
 '''.replace('@@term_title@@', term_title)
 _tmux_commands_cd = """\
-send-keys -t "{pane_index}" C-z 'cd {directory}' Enter
+send-keys -t "{pane_index}" C-u 'cd {directory}' Enter
 """
 
 def _fn_commands_attach(session_id, window_index, pane_index, directory=None, **kw):
     txt = _tmux_commands_attach.format(**locals())
     if directory is not None:
-        txt2 = _tmux_commands_cd.format(**locals())
-        txt = '\n'.join([txt, txt2])
+        if directory != kw['pane_current_path']:
+            txt2 = _tmux_commands_cd.format(**locals())
+            txt = '\n'.join([txt, txt2])
     return FileInfo('tmux_commands_attach', txt, False)
 
 def tmux_source(**kw):
@@ -61,7 +62,7 @@ setw -g automatic-rename off
 '''.replace('@@term_title@@', term_title)
 
 _tmux_commands_cd_default = """\
-send-keys C-z 'cd {directory}' Enter
+send-keys C-u 'cd {directory}' Enter
 """
 
 def tmux_attach(directory=None, **kw):
