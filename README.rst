@@ -1,7 +1,7 @@
 dynmen_scripts
 ==============
 
-A collection of scripts using dynmen.
+A collection of scripts using `dynmen <https://github.com/frostidaho/dynmen>`_.
 They're just intended for my personal use or
 as examples for using dynmen.
 
