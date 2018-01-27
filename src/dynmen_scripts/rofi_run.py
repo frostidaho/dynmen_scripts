@@ -8,6 +8,7 @@ def launch_rofi(show, *other_modi):
     menu.fullscreen = True
     menu.modi = ','.join(modi)
     menu.show = show
+    menu.show_icons = True
     menu.pid = '/tmp/rofi_{}'.format(getenv('USER', 'nouser'))
     menu.padding = int(get_min_resolution() / 4)
     menu()
